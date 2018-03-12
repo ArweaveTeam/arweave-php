@@ -59,6 +59,30 @@ class API
     }
 
     /**
+     * Get a transation by transaction ID.
+     *
+     * @param  string $transaction_id
+     *
+     * @return mixed
+     */
+    public function getTransaction(string $transaction_id)
+    {
+        return $this->get(sprintf('tx/%s', $transaction_id));
+    }
+
+    /**
+     * Get the data only from a transation by transaction ID.
+     *
+     * @param  string $transaction_id
+     *
+     * @return mixed
+     */
+    public function getData(string $transaction_id)
+    {
+        return $this->get(sprintf('tx/%s/data', $transaction_id));
+    }
+
+    /**
      * Get the last transaction ID for the given wallet address.
      *
      * @param  string $wallet_address

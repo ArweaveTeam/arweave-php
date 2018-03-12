@@ -45,6 +45,30 @@ class Arweave
     }
 
     /**
+     * Get a transation by transaction ID.
+     *
+     * @param  string $transaction_id
+     *
+     * @return mixed
+     */
+    public function getTransaction(string $transaction_id)
+    {
+        return $this->api->getTransaction($transaction_id);
+    }
+
+    /**
+     * Get the data only from a transation by transaction ID.
+     *
+     * @param  string $transaction_id
+     *
+     * @return mixed
+     */
+    public function getData(string $transaction_id)
+    {
+        return $this->api->getData($transaction_id);
+    }
+
+    /**
      * Create a new transaction object from a given wallet and piece of data.
      *
      * @param  Wallet $wallet Sending wallet
