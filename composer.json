@@ -1,0 +1,21 @@
+{
+    "name": "kyle/arweave-sdk",
+    "type": "library",
+    "description": "Library for sending transactions to the Arweave network",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Kyle Beckles",
+            "email": "kyle@arweave.org"
+        }
+    ],
+    "require": {
+        "phpseclib/phpseclib": "^2.0",
+        "spomky-labs/jose": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Arweave\\SDK\\": "Arweave/SDK/"
+        }
+    }
+}
