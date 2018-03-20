@@ -1,8 +1,8 @@
-##Arweave PHP SDK
+## Arweave PHP SDK
 
 This package allows us to interact with the Arweave network, we can use it to read and write transactions and data to the network.
 
-##Installation
+## Installation
 We strongly recommend using [composer](https://getcomposer.org) for installation.
 
 `composer require arweave/arweave-sdk`
@@ -15,10 +15,10 @@ Or add the following to your project `composer.json` file.
 }
 ```
 
-##Basic usage
+## Basic usage
 
 
-####Instantiation
+#### Instantiation
 Start by creating a `Arweave` object, this is the primary SDK class your application should use, it contains the public methods for creating, sending and getting transactions.
 
 
@@ -28,7 +28,7 @@ $arweave = new \Arweave\SDK\Arweave('139.59.81.47');
 
 The IP address given should be any valid Arweave node IP.
 
-####Getting a Transaction
+#### Getting a Transaction
 Once we have our `Arweave` object we can now get transactions from the network using a valid transaction ID.
 
 For example:
@@ -56,7 +56,7 @@ object(Arweave\SDK\Support\Transaction)#23 (1) {
 }
 ```
 
-####Getting data from a Transaction
+#### Getting data from a Transaction
 There are two methods of getting data from a transaction, we can either:
 
 ```php
@@ -85,7 +85,7 @@ This will give us the raw data (base64url encoded), it's useful if we also need 
 
 
 
-####Loading a Wallet
+#### Loading a Wallet
 To load a wallet you need a JSON Web Key (JWK), a JWK is simply a JSON representation of a public/private key pair, they look something like this:
 
 ```json
@@ -111,7 +111,7 @@ $jwk = json_decode(file_get_contents('jwk.json'), true);
 $wallet =  new \Arweave\SDK\Support\Wallet($jwk);`
 ```
 
-####Creating a Transaction
+#### Creating a Transaction
 Transactions need to be signed for them to be accepted by the network, so **this step requires a wallet**.
 
 ```php
@@ -123,10 +123,10 @@ $arweave->commit($transaction);
 ```
 
 
-##Examples
+## Examples
 
 
-####Sending data to the network 
+#### Sending data to the network 
 
 
 ```php
@@ -154,7 +154,7 @@ $transaction_id = $transaction->getAttribute('id');
 $arweave->commit($transaction);
 ```
 
-####Getting data from the network
+#### Getting data from the network
 ```php
 $arweave = new \Arweave\SDK\Arweave('139.59.81.47');
 
