@@ -93,4 +93,9 @@ class Transaction
         $this->attributes['reward'] .
         base64_decode(Helpers::base64urlDecode($this->attributes['last_tx']));
     }
+
+    public function getAttribute(string $attribute)
+    {
+        return $this->attributes[$attribute] ?? null;
+    }
 }

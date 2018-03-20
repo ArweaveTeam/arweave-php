@@ -1,7 +1,7 @@
 {
-    "name": "kyle/arweave-sdk",
+    "name": "arweave/arweave-sdk",
     "type": "library",
-    "description": "Library for sending transactions to the Arweave network",
+    "description": "Arweave PHP SDK",
     "license": "GPL-2.0",
     "authors": [
         {

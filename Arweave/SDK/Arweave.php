@@ -22,7 +22,7 @@ class Arweave
      *
      * @var string
      */
-    protected $ip = '139.59.81.47';
+    protected $ip;
 
     /**
      * @param string $ip
