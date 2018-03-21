@@ -3,6 +3,8 @@
     "type": "library",
     "description": "Arweave PHP SDK",
     "license": "GPL-2.0",
+    "keywords": ["arweave"],
+    "homepage": "https://arweave.org",
     "authors": [
         {
             "name": "Kyle Beckles",
@@ -11,7 +13,11 @@
     ],
     "require": {
         "phpseclib/phpseclib": "^2.0",
-        "spomky-labs/jose": "^7.0"
+        "spomky-labs/jose": "^7.0",
+        "php": "^7.0",
+        "ext-curl": "*",
+        "ext-mbstring": "*",
+        "ext-gmp": "*"
     },
     "autoload": {
         "psr-4": {
