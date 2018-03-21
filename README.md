@@ -15,7 +15,46 @@ Or add the following to your project `composer.json` file.
 }
 ```
 
-## Basic usage
+## Quick Examples
+
+
+#### Sending data to the network 
+
+
+```php
+include __DIR__ . '/vendor/autoload.php';
+
+$arweave = new \Arweave\SDK\Arweave('139.59.81.47');
+
+$jwk = json_decode(file_get_contents('jwk.json'), true);
+
+$wallet =  new \Arweave\SDK\Support\Wallet($jwk);
+
+$data = json_encode([
+	'message' => 'Some message',
+	'data' => [
+		'Some data 1',
+		'Some data 2',
+		'Some data 3',
+	]
+]);
+
+$transaction = $arweave->createTransaction($wallet, $data));
+
+$transaction_id = $transaction->getAttribute('id');
+
+$arweave->commit($transaction);
+```
+
+#### Getting data from the network
+```php
+$arweave = new \Arweave\SDK\Arweave('139.59.81.47');
+
+$arweave->getData('mvscO3JBlwweOnfkkHpc3fINQ6cUtn_g5aFY9af5TfQ')
+```
+
+
+## Usage
 
 
 #### Instantiation
@@ -57,17 +96,17 @@ object(Arweave\SDK\Support\Transaction)#23 (1) {
 ```
 
 #### Getting data from a Transaction
-There are two methods of getting data from a transaction, we can either:
+There are two methods for getting data from a transaction, we can either:
 
 ```php
 $data = $arweave->getData($transaction_id)
 //string(45) "{"body":"Test body","subject":"Test subject"}"
 ```
 
-This method returns the decoded data from a transaction. This is the simplest method and probably the one you'll need most often.
+This method returns the original and decoded data from a transaction. This is the simplest method and probably the one you'll need most often.
 
-Alternatively, if we also need other transaction attributes we can do the following:
 
+Alternatively, if we need the encoded data or need other transaction attributes we can do the following:
 
 
 ```php
@@ -81,12 +120,12 @@ $encoded_data = $transaction->getAttribute('data');
 $original_data = base64_decode(Helpers::base64urlDecode($encoded_data));
 //string(45) "{"body":"Test body","subject":"Test subject"}"
 ```
-This will give us the raw data (base64url encoded), it's useful if we also need other attributes about the transaction as we can extract other values (owner, signature, tags, etc) from the same `Transaction` variable.
+This will give us the raw data (still base64 url encoded). It's useful if we need the encoded data or we also need other attributes about the transaction, as we can extract other values (owner, signature, tags, etc) from the same `Transaction` variable and it still only requires one API call.
 
 
 
 #### Loading a Wallet
-To load a wallet you need a JSON Web Key (JWK), a JWK is simply a JSON representation of a public/private key pair, they look something like this:
+To load a wallet you need a Key file. Arweave uses JSON Web Keys (JWK) as the key file format, a JWK is simply a JSON representation of a public/private key pair and they look something like this:
 
 ```json
 {
@@ -105,11 +144,15 @@ To load a wallet you need a JSON Web Key (JWK), a JWK is simply a JSON represent
 
 We first need to decode our JWK file to a PHP array, then we can simply pass that array into a new `Wallet` object.
 
+**You should treat your JWK as you would treat an API key or a password**. You should **never** expose them or place them in any publicly accessible location and **never** commit them to any version control system, **doing so could compromise your wallet and its contents**.
+
 ```php
 $jwk = json_decode(file_get_contents('jwk.json'), true);
 
 $wallet =  new \Arweave\SDK\Support\Wallet($jwk);`
 ```
+
+This is just one suggested method of storing your JWK but there's no requirement that you store in as a JSON file, you could also store it in an environment variable, a database, a PHP file, or anywhere else. As long as it ends up as a PHP array it should work just fine.
 
 #### Creating a Transaction
 Transactions need to be signed for them to be accepted by the network, so **this step requires a wallet**.
@@ -122,42 +165,4 @@ $transaction = $arweave->createTransaction($wallet, $data));
 $arweave->commit($transaction);
 ```
 
-
-## Examples
-
-
-#### Sending data to the network 
-
-
-```php
-include __DIR__ . '/vendor/autoload.php';
-
-$arweave = new \Arweave\SDK\Arweave('139.59.81.47');
-
-$jwk = json_decode(file_get_contents('jwk.json'), true);
-
-$wallet =  new \Arweave\SDK\Support\Wallet($jwk);
-
-$data = json_encode([
-	'message' => 'Some message',
-	'data' => [
-		'Some data 1',
-		'Some data 2',
-		'Some data 3',
-	]
-]);
-
-$transaction = $arweave->createTransaction($wallet, $data));
-
-$transaction_id = $transaction->getAttribute('id');
-
-$arweave->commit($transaction);
-```
-
-#### Getting data from the network
-```php
-$arweave = new \Arweave\SDK\Arweave('139.59.81.47');
-
-$arweave->getData('mvscO3JBlwweOnfkkHpc3fINQ6cUtn_g5aFY9af5TfQ')
-```
 

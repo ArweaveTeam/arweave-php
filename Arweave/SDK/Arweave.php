@@ -22,7 +22,7 @@ class Arweave
      *
      * @var string
      */
-    protected $ip;
+    protected $ip = '139.59.81.47';
 
     /**
      * @param string $ip
@@ -57,7 +57,7 @@ class Arweave
     }
 
     /**
-     * Get the data only from a transation by transaction ID.
+     * Get the original and decoded data from a transation by transaction ID.
      *
      * @param  string $transaction_id
      *
@@ -65,7 +65,7 @@ class Arweave
      */
     public function getData(string $transaction_id)
     {
-        return $this->api->getData($transaction_id);
+        return base64_Decode(Helpers::base64urlDecode($this->api->getData($transaction_id)));
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Arweave\SDK\Support;
 
+use Arweave\SDK\Exceptions\TransactionNotFoundException;
 use Arweave\SDK\Support\Transaction;
 use Exception;
 
@@ -63,11 +64,11 @@ class API
      *
      * @param  string $transaction_id
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function getTransaction(string $transaction_id)
     {
-        return $this->get(sprintf('tx/%s', $transaction_id));
+        return new Transaction($this->get(sprintf('tx/%s', $transaction_id)));
     }
 
     /**
@@ -75,7 +76,7 @@ class API
      *
      * @param  string $transaction_id
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function getData(string $transaction_id)
     {
@@ -87,9 +88,9 @@ class API
      *
      * @param  string $wallet_address
      *
-     * @return string
+     * @return string|null
      */
-    public function lastTransaction(string $wallet_address)
+    public function lastTransaction(string $wallet_address): string
     {
         return $this->get(sprintf('wallet/%s/last_tx', $wallet_address));
     }
@@ -176,7 +177,7 @@ class API
         $response = curl_exec($handle);
 
         if (curl_getinfo($handle, CURLINFO_HTTP_CODE) == 404) {
-            throw new Exception('Arweave API - Resource not found');
+            throw new TransactionNotFoundException(sprintf('Arweave API - Transaction not found %s', $url));
         }
 
         if (curl_getinfo($handle, CURLINFO_HTTP_CODE) != 200) {

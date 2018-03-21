@@ -23,6 +23,7 @@ class Transaction
         'data'      => null,
         'reward'    => null,
         'signature' => null,
+        'tags'      => [],
     ];
 
     /**
@@ -38,7 +39,7 @@ class Transaction
 
         // All fields must be strings, so cast them all
         $this->attributes = array_map(function ($attribute) {
-            return (string) $attribute;
+            return is_array($attribute) ? $attribute : (string) $attribute;
         }, $this->attributes);
     }
 
@@ -50,6 +51,18 @@ class Transaction
     public function getAttributes(): array
     {
         return $this->attributes;
+    }
+
+    /**
+     * Get an attribute.
+     *
+     * @param  string $attribute Attribute key
+     *
+     * @return mixed
+     */
+    public function getAttribute(string $attribute)
+    {
+        return $this->attributes[$attribute] ?? null;
     }
 
     /**
@@ -92,10 +105,5 @@ class Transaction
         $this->attributes['quantity'] .
         $this->attributes['reward'] .
         base64_decode(Helpers::base64urlDecode($this->attributes['last_tx']));
-    }
-
-    public function getAttribute(string $attribute)
-    {
-        return $this->attributes[$attribute] ?? null;
     }
 }
