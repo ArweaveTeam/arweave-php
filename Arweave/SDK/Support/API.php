@@ -108,7 +108,6 @@ class API
      *   int(8)
      * }
      * 
-     
      * @param  string $transaction_id
      *
      * @throws TransactionNotFoundException
