@@ -9,14 +9,23 @@ use Exception;
 class API
 {
     /**
-     * Node IP to connect to.
+     * Protocol to connect to node with.
+     * 'http' or 'http'
+     * @var string
+     */
+    private $protocol;
+
+    /**
+     * Node IP or hostname to connect to.
      *
      * @var string
      */
-    private $ip;
+    private $host;
 
     /**
      * Network port to use.
+     * 
+     * Default should be 1984, 443, or 80
      *
      * @var string
      */
@@ -30,17 +39,27 @@ class API
     private $handle;
 
     /**
-     * @param string $ip
+     * @param string $protocol
+     * @param string $host
      * @param string $port
      */
-    public function __construct($ip, $port = '1984')
+    public function __construct($protocol, $host, $port)
     {
-        if (!$ip) {
-            throw new Exception('No IP specified');
+        if (!$protocol) {
+            throw new Exception('No Protocol specified');
+        }
+    
+        if (!$host) {
+            throw new Exception('No host specified');
+        }
+    
+        if (!$port) {
+            throw new Exception('No Port specified');
         }
 
-        $this->ip   = $ip;
-        $this->port = $port;
+        $this->protocol = $protocol;
+        $this->host     = $host;
+        $this->port     = $port;
 
         $this->handle = curl_init();
     }
@@ -60,10 +79,12 @@ class API
     }
 
     /**
-     * Get a transation by transaction ID.
+     * Get a transaction by its ID.
      *
      * @param  string $transaction_id
      *
+     * @throws TransactionNotFoundException
+     * 
      * @return mixed|null
      */
     public function getTransaction(string $transaction_id)
@@ -72,15 +93,57 @@ class API
     }
 
     /**
-     * Get the data only from a transation by transaction ID.
+     * Get a transaction's status by its ID.
+     * 
+     * String values for pending transactions, e.g. "Pending".
+     * 
+     * Assoc array with the block info if the transaction has been accepted, e.g.
+     * 
+     * array(3) {
+     *   ["block_indep_hash"]=>
+     *   string(64) "hJm2wxoAgneZdRNy2dDFLZnNGlImsSjkhEytC1g2H8GJBzoef5bqi5dlkCzT4HUl"
+     *   ["block_height"]=>
+     *   int(190582)
+     *   ["number_of_confirmations"]=>
+     *   int(8)
+     * }
+     * 
+     
+     * @param  string $transaction_id
+     *
+     * @throws TransactionNotFoundException
+     * 
+     * @return string[]|string
+     */
+    public function getTransactionStatus(string $transaction_id)
+    {
+        return $this->get(sprintf('tx/%s/status', $transaction_id));
+    }
+
+    /**
+     * Get the decoded data from a transaction by transaction ID.
      *
      * @param  string $transaction_id
      *
+     * @throws TransactionNotFoundException
+     * 
      * @return mixed|null
      */
-    public function getData(string $transaction_id)
+    public function getTransactionData(string $transaction_id)
     {
-        return $this->get(sprintf('tx/%s/data', $transaction_id));
+        return base64_Decode(Helpers::base64urlDecode($this->get(sprintf('tx/%s/data', $transaction_id))));
+    }
+
+    /**
+     * Get the last transaction ID for a given wallet address.
+     *
+     * @param  string $wallet_address
+     *
+     * @return string|null
+     */
+    public function getLastTransaction(string $wallet_address): string
+    {
+        return $this->get(sprintf('wallet/%s/last_tx', $wallet_address));
     }
 
     /**
@@ -90,21 +153,22 @@ class API
      *
      * @return string|null
      */
-    public function lastTransaction(string $wallet_address): string
+    public function getBalance(string $wallet_address): string
     {
-        return $this->get(sprintf('wallet/%s/last_tx', $wallet_address));
+        return $this->get(sprintf('wallet/%s/balance', $wallet_address));
     }
 
     /**
-     * Get the reward value for a message of size $byte_size.
+     * Get the reward/fee for a transaction with the given data length.
      *
-     * @param  int $byte_size Message size in bytes
+     * @param int $byte_size Number of bytes
+     * @param string $address Wallet address of the recipient (optional)
      *
      * @return int
      */
-    public function getReward($byte_size): int
+    public function getReward($byte_size, $address = ''): int
     {
-        return $this->get(sprintf('price/%s', $byte_size));
+        return $this->get(sprintf('price/%s/%s', $byte_size, $address));
     }
 
     /**
@@ -115,15 +179,16 @@ class API
      *
      * @return
      */
-    private function post(string $path, array $data = [])
+    public function post(string $path, array $data = [])
     {
-        $url = sprintf('http://%s:%s/%s', $this->ip, $this->port, $path);
+        $url = sprintf('%s://%s:%s/%s', $this->protocol, $this->host, $this->port, $path);
 
         $handle = $this->handle;
 
         curl_reset($handle);
         curl_setopt($handle, CURLOPT_URL, $url);
-        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($handle, CURLOPT_TIMEOUT, 10);
         curl_setopt($handle, CURLOPT_POST, 1);
         curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($data));
 
@@ -149,16 +214,13 @@ class API
     /**
      * Get data from the network.
      *
-     * JSON responses will be decoded and returned as a json_decoded array,
-     * all other types will be returned as-is.
-     *
      * @param  string $path API endpoint
      *
      * @return mixed
      */
-    private function get(string $path)
+    public function get(string $path)
     {
-        $url = sprintf('http://%s:%s/%s', $this->ip, $this->port, $path);
+        $url = sprintf('%s://%s:%s/%s', $this->protocol, $this->host, $this->port, $path);
 
         $handle = $this->handle;
 
@@ -166,7 +228,8 @@ class API
 
         curl_setopt($handle, CURLOPT_URL, $url);
 
-        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($handle, CURLOPT_TIMEOUT, 10);
 
         curl_setopt($handle, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
@@ -175,15 +238,22 @@ class API
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
         $response = curl_exec($handle);
+        $status = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
-        if (curl_getinfo($handle, CURLINFO_HTTP_CODE) == 404) {
-            throw new TransactionNotFoundException(sprintf('Arweave API - Transaction not found %s', $url));
+        if (in_array($status, [404, 410] )) {
+            throw new TransactionNotFoundException(sprintf("Arweave API - Unexpected response %s',
+                \n%s\n%s\n",
+                $url,
+                $status,
+                $response
+            ));
         }
+        
 
-        if (curl_getinfo($handle, CURLINFO_HTTP_CODE) != 200) {
+        if (!in_array($status, [200, 202] )) {
             throw new Exception(sprintf("Arweave API - Unexpected response (%s)
             	\n%s\n",
-                curl_getinfo($handle, CURLINFO_HTTP_CODE),
+                $status,
                 $response
             ));
         }
@@ -194,5 +264,6 @@ class API
 
         return $response;
     }
+
 
 }

@@ -2,10 +2,11 @@
 
 namespace Arweave\SDK;
 
+use Exception;
 use Arweave\SDK\Support\API;
+use Arweave\SDK\Support\Wallet;
 use Arweave\SDK\Support\Helpers;
 use Arweave\SDK\Support\Transaction;
-use Arweave\SDK\Support\Wallet;
 
 class Arweave
 {
@@ -18,54 +19,24 @@ class Arweave
     protected $api;
 
     /**
-     * Network node IP
+     * Arweave node hostname or IP address
      *
      * @var string
      */
-    protected $ip = '139.59.81.47';
+    protected $host;
 
     /**
-     * @param string $ip
+     * @param string $protocol 'http' or 'https'
+     * @param string $host IP address or hostname
+     * @param int $port Port number
      */
-    public function __construct($ip)
+    public function __construct($protocol, $host, $port)
     {
-        $this->api = new API($ip);
+        $this->api = new API($protocol, $host, $port);
     }
 
-    /**
-     * Commit a transaction to the blockweave.
-     *
-     * @param  \Arweave\SDK\Support\Transaction $transaction
-     *
-     * @return \Arweave\SDK\Support\Transaction
-     */
-    public function commit(Transaction $transaction)
-    {
-        return $this->api->commit($transaction);
-    }
-
-    /**
-     * Get a transation by transaction ID.
-     *
-     * @param  string $transaction_id
-     *
-     * @return mixed
-     */
-    public function getTransaction(string $transaction_id)
-    {
-        return $this->api->getTransaction($transaction_id);
-    }
-
-    /**
-     * Get the original and decoded data from a transation by transaction ID.
-     *
-     * @param  string $transaction_id
-     *
-     * @return mixed
-     */
-    public function getData(string $transaction_id)
-    {
-        return base64_Decode(Helpers::base64urlDecode($this->api->getData($transaction_id)));
+    public function api(): APi {
+        return $this->api;
     }
 
     /**
@@ -77,20 +48,32 @@ class Arweave
      *
      * @return \Arweave\SDK\Support\Transaction
      */
-    public function createTransaction(Wallet $wallet, string $data): Transaction
+    public function createTransaction(Wallet $wallet, $attributes): Transaction
     {
+
+        if (!$attributes || !is_array($attributes)) {
+            throw new Exception('Invalid transaction attributes passed');
+        }
+
+        $encoded_tags = array_map(function($name) use ($attributes){
+            return [
+                'name' => Helpers::base64urlEncode(base64_encode($name)),
+                'value' => Helpers::base64urlEncode(base64_encode($attributes['tags'][$name]))
+            ];
+        }, array_keys($attributes['tags'] ?? []));
+
         $transaction = new Transaction([
-            'last_tx'  => $this->api->lastTransaction($wallet->getAddress()),
-            'owner'    => $wallet->getAddress(),
-            'quantity' => 0,
-            'type'     => 'data',
-            'data'     => Helpers::base64urlEncode(base64_encode($data)),
-            'reward'   => $this->api->getReward(strlen($data) + 2000),
+            'last_tx'  => $this->api->getLastTransaction($wallet->getAddress()),
+            'owner'    => $wallet->getOwner(),
+            'tags'     => $encoded_tags,
+            'target'   => $attributes['target'] ?? '',
+            'quantity' => $attributes['quantity'] ?? '',
+            'data'     => Helpers::base64urlEncode(base64_encode($attributes['data'] ?? '')),
+            'reward'   => $this->api->getReward(strlen($attributes['data'] ?? ''), $attributes['target'] ?? null),
         ]);
 
         $transaction->sign($wallet);
 
         return $transaction;
     }
-
 }
