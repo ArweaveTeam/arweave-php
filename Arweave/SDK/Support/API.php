@@ -171,6 +171,24 @@ class API
     }
 
     /**
+     * Get matching transaction IDs from a given ArQL query,
+     * 
+     * @param string[] $query ArQL query object
+     * 
+     * @return string[]
+     */
+    public function arql(array $query): array
+    {
+        $response = $this->post('arql', $query);
+
+        if (is_array($response)) {
+            return $response;
+        }
+
+        return [];
+    }
+
+    /**
      * Post a HTTP message to the network.
      *
      * @param  string $path API endpoint
@@ -205,6 +223,10 @@ class API
                 curl_getinfo($handle, CURLINFO_HTTP_CODE),
                 $response
             ));
+        }
+
+        if ($json = json_decode($response, true)) {
+            return $json;
         }
 
         return $response;
@@ -247,7 +269,6 @@ class API
                 $response
             ));
         }
-        
 
         if (!in_array($status, [200, 202] )) {
             throw new Exception(sprintf("Arweave API - Unexpected response (%s)

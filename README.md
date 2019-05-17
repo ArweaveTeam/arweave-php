@@ -115,6 +115,23 @@ $encoded_data = $transaction->getAttribute('data');
 $original_data = base64_decode(\Arweave\SDK\Support\Helpers::base64urlDecode($encoded_data));
 //string(45) "{"body":"Test body","subject":"Test subject"}"
 ```
+#### ArQL
+
+```php
+$transactionIds = $arweave->api()->arql([
+    'op' => 'equals',
+    'expr1' => 'App-Name',
+    'expr2' => 'arweaveapps'
+]);
+
+// array(31) {
+//   [0]=>
+//   string(43) "NXg2OaRRygb7RJZFbkcEYlS2LNNfsqxxobzUqz7ELnc"
+//   [1]=>
+//   string(43) "i3_aC8xIO_4TpMqp5sR4WVUwbA1p2sPCu11cLVKN89U
+// ...
+
+```
 
 #### Loading a Wallet
 To load a wallet you need a Key file. Arweave uses JSON Web Keys (JWK) as the key file format, a JWK is simply a JSON representation of a public/private key pair and they look something like this:
@@ -148,4 +165,3 @@ This is just one suggested method of storing your JWK but there's no requirement
 
 #### Creating a Transaction
 Transactions need to be signed for them to be accepted by the network, so **this step requires a wallet**.
-

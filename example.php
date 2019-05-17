@@ -36,3 +36,14 @@ $status = $arweave->api()->getTransaction($tx->getAttribute('id'));
 
 // Now print the status
 var_dump($status);
+
+
+// Get transaction ids
+$transactionIds = $arweave->api()->arql([
+    'op' => 'equals',
+    'expr1' => 'App-Name',
+    'expr2' => 'arweaveapps'
+]);
+
+// Dump the transaction ids
+var_dump($transactionIds);
