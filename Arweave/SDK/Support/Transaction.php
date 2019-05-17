@@ -17,15 +17,15 @@ class Transaction
      * @var mixed[]
      */
     protected $attributes = [
-        'id'        => null,
-        'last_tx'   => null,
-        'owner'     => null,
+        'id'        => '',
+        'last_tx'   => '',
+        'owner'     => '',
         'tags'      => [],
-        'target'    => null,
-        'quantity'  => null,
-        'data'      => null,
-        'reward'    => null,
-        'signature' => null,
+        'target'    => '',
+        'quantity'  => '0',
+        'data'      => '',
+        'reward'    => '0',
+        'signature' => '',
     ];
 
     /**

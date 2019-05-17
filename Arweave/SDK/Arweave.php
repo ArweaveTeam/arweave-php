@@ -67,9 +67,13 @@ class Arweave
             'owner'    => $wallet->getOwner(),
             'tags'     => $encoded_tags,
             'target'   => $attributes['target'] ?? '',
-            'quantity' => $attributes['quantity'] ?? '',
+            'quantity' => $attributes['quantity'] ?? '0',
             'data'     => Helpers::base64urlEncode(base64_encode($attributes['data'] ?? '')),
-            'reward'   => $this->api->getReward(strlen($attributes['data'] ?? ''), $attributes['target'] ?? null),
+            'reward'   => $attributes['reward'] ?? 
+                $this->api->getReward(
+                    strlen($attributes['data'] ?? ''),
+                    $attributes['target'] ?? null
+                ),
         ]);
 
         $transaction->sign($wallet);
