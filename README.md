@@ -41,7 +41,7 @@ printf('Your transaction ID is %s', $transaction->getAttribute('id'));
 
 
 // commit() sends the transaction to the network, once sent this can't be undone.
-$arweave->commit($transaction);
+$arweave->api()->commit($transaction);
 ```
 
 #### Getting data from the network
