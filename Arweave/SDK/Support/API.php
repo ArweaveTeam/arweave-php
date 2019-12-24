@@ -142,7 +142,7 @@ class API
      */
     public function getLastTransaction(string $wallet_address): string
     {
-        return $this->get(sprintf('wallet/%s/last_tx', $wallet_address));
+            return $this->get(sprintf('/tx_anchor'));
     }
 
     /**
