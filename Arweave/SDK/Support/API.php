@@ -154,7 +154,7 @@ class API
      */
     public function getTransactionAnchor()
     {
-        return $this->get(sprintf('/tx_anchor'));
+        return $this->get(sprintf('tx_anchor'));
     }
 
     /**
