@@ -63,7 +63,7 @@ class Arweave
         }, array_keys($attributes['tags'] ?? []));
 
         $transaction = new Transaction([
-            'last_tx'  => $this->api->getLastTransaction($wallet->getAddress()),
+            'last_tx'  => $this->api->getTransactionAnchor(),
             'owner'    => $wallet->getOwner(),
             'tags'     => $encoded_tags,
             'target'   => $attributes['target'] ?? '',

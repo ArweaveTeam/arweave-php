@@ -146,6 +146,18 @@ class API
     }
 
     /**
+     * Get the tx_anchor
+     *
+     * @param
+     *
+     * @return string|null
+     */
+    public function getTransactionAnchor()
+    {
+        return $this->get(sprintf('/tx_anchor'));
+    }
+
+    /**
      * Get the last transaction ID for the given wallet address.
      *
      * @param  string $wallet_address
