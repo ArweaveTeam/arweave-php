@@ -18,7 +18,7 @@ Or add the following to your project `composer.json` file.
 ## Quick Examples
 
 
-#### Sending data to the network 
+#### Sending data to the network
 
 
 ```php
@@ -41,7 +41,7 @@ printf('Your transaction ID is %s', $transaction->getAttribute('id'));
 
 
 // commit() sends the transaction to the network, once sent this can't be undone.
-$arweave->commit($transaction);
+$arweave->api()->commit($transaction);
 ```
 
 #### Getting data from the network
@@ -149,7 +149,7 @@ To load a wallet you need a Key file. Arweave uses JSON Web Keys (JWK) as the ke
   "dq": "gk_Sb5cFAQQ...",
   "qi": "k65nfXdh4qx..."
 }
-``` 
+```
 
 We first need to decode our JWK file to a PHP array, then we can simply pass that array into a new `Wallet` object.
 
