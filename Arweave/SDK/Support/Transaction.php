@@ -124,7 +124,7 @@ class Transaction
 
     public function verify(): bool
     {
-        $public_key = RSAKey::createFromJWK(JWK::create([
+        $public_key = RSAKey::createFromJWK(new JWK([
             'kty' => 'RSA',
             'e'   => 'AQAB',
             'n'   => $this->attributes['owner']

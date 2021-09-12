@@ -71,7 +71,7 @@ class Wallet
 
     private function RSAPrivateFromJWK(array $jwk): RSA
     {
-        $private_key = RSAKey::createFromJWK(JWK::create($jwk));
+        $private_key = RSAKey::createFromJWK(new JWK($jwk));
 
         $rsa = new RSA;
 
