@@ -89,7 +89,13 @@ class API
      */
     public function getTransaction(string $transaction_id)
     {
-        return new Transaction($this->get(sprintf('tx/%s', $transaction_id)));
+        $response = $this->get(sprintf('tx/%s', $transaction_id));
+
+        if (! is_array($response)) {
+            throw new Exception($response);
+        }
+
+        return new Transaction($response);
     }
 
     /**
